@@ -1,0 +1,1 @@
+# metaequity-token-contract
