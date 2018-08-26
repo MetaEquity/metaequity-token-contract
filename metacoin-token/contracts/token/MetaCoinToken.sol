@@ -4,11 +4,9 @@ pragma solidity ^0.4.23;
 // Standard ERC20 token with the ability to freeze and unfreeze token transfer
 import '../common/token/ERC20/PausableToken.sol';
 
-// Standard ERC20 token with the ability to burn tokens
-import '../common/token/ERC20/BurnableToken.sol';
-
 // Standard ERC20 token with the ability to mint tokens
-import '../common/token/ERC20/MintableToken.sol';
+// import '../common/token/ERC20/MintableToken.sol';
+import '../common/token/ERC20/MintableAndCappedToken.sol';
 
 // //
 // // Blocks ERC223 tokens and allows the smart contract to transfer ownership of
@@ -23,7 +21,7 @@ import '../common/token/ERC20/MintableToken.sol';
 /**
  * @title MetaCoinToken
  */
- contract MetaCoinToken is PausableToken, MintableToken, BurnableToken {
+ contract MetaCoinToken is PausableToken, MintableAndCappedToken {
 
   string public constant name = "Meta Coin";
   string public constant symbol = "META"; 
@@ -35,8 +33,9 @@ import '../common/token/ERC20/MintableToken.sol';
    */
   constructor() public {
     balances[msg.sender] = 0;
-
     emit Transfer(0x0, msg.sender, 0);
+
+    cap = 1000000000 * (10 ** uint256(decimals));//One billion tokens capped
   }
  
   function approveAndCall(address spender, uint _value, bytes data) public returns (bool success) {
@@ -45,7 +44,7 @@ import '../common/token/ERC20/MintableToken.sol';
     return true;
   }
 
-  event SpendMetaCoinEvent(address _contractAddressToSpend, uint _noOfCreditsToSpend, uint _operationID, uint256 _input1, uint256 _input2, uint256 _input3, string _input4);
+  event SpendMetaCoinEvent(address contractAddressToSpend, uint noOfCoinsToSpend, uint operationID, uint256 input1, uint256 input2, uint256 input3, string input4);
 
   function spendMetaCoin(address _contractAddressToSpend, uint _noOfCoinsToSpend, uint _operationID, uint256 _input1, uint256 _input2, uint256 _input3, string _input4) public returns (bool success) {
     approve(_contractAddressToSpend, _noOfCoinsToSpend);
